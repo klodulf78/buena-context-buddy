@@ -42,31 +42,34 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
-            referencedColumns: ["id"]
+            referencedColumns: ["property_id"]
           },
         ]
       }
       properties: {
         Row: {
-          address: string
+          address: string | null
           context_md: string | null
           id: string
           last_run_at: string | null
-          name: string
+          name: string | null
+          property_id: string
         }
         Insert: {
-          address: string
+          address?: string | null
           context_md?: string | null
           id?: string
           last_run_at?: string | null
-          name: string
+          name?: string | null
+          property_id: string
         }
         Update: {
-          address?: string
+          address?: string | null
           context_md?: string | null
           id?: string
           last_run_at?: string | null
-          name?: string
+          name?: string | null
+          property_id?: string
         }
         Relationships: []
       }
@@ -75,7 +78,10 @@ export type Database = {
           answer: string | null
           created_at: string
           id: string
+          input_tokens: number | null
           latency_ms: number | null
+          mode: string | null
+          output_tokens: number | null
           property_id: string
           question: string
         }
@@ -83,7 +89,10 @@ export type Database = {
           answer?: string | null
           created_at?: string
           id?: string
+          input_tokens?: number | null
           latency_ms?: number | null
+          mode?: string | null
+          output_tokens?: number | null
           property_id: string
           question: string
         }
@@ -91,7 +100,10 @@ export type Database = {
           answer?: string | null
           created_at?: string
           id?: string
+          input_tokens?: number | null
           latency_ms?: number | null
+          mode?: string | null
+          output_tokens?: number | null
           property_id?: string
           question?: string
         }
@@ -101,7 +113,7 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
-            referencedColumns: ["id"]
+            referencedColumns: ["property_id"]
           },
         ]
       }
