@@ -10,8 +10,8 @@
 //   SUPABASE_SERVICE_ROLE_KEY service-role key — never ship to UI
 //   ANTHROPIC_API_KEY         Anthropic console key
 
-import { createClient } from "npm:@supabase/supabase-js@2";
-import Anthropic from "npm:@anthropic-ai/sdk@0.30.1";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import Anthropic from "https://esm.sh/@anthropic-ai/sdk@0.30.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
