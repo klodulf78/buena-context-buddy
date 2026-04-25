@@ -14,7 +14,97 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      context_updates: {
+        Row: {
+          created_at: string
+          diff_summary: string | null
+          id: string
+          property_id: string
+          source_filename: string | null
+        }
+        Insert: {
+          created_at?: string
+          diff_summary?: string | null
+          id?: string
+          property_id: string
+          source_filename?: string | null
+        }
+        Update: {
+          created_at?: string
+          diff_summary?: string | null
+          id?: string
+          property_id?: string
+          source_filename?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "context_updates_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      properties: {
+        Row: {
+          address: string
+          context_md: string | null
+          id: string
+          last_run_at: string | null
+          name: string
+        }
+        Insert: {
+          address: string
+          context_md?: string | null
+          id?: string
+          last_run_at?: string | null
+          name: string
+        }
+        Update: {
+          address?: string
+          context_md?: string | null
+          id?: string
+          last_run_at?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      queries: {
+        Row: {
+          answer: string | null
+          created_at: string
+          id: string
+          latency_ms: number | null
+          property_id: string
+          question: string
+        }
+        Insert: {
+          answer?: string | null
+          created_at?: string
+          id?: string
+          latency_ms?: number | null
+          property_id: string
+          question: string
+        }
+        Update: {
+          answer?: string | null
+          created_at?: string
+          id?: string
+          latency_ms?: number | null
+          property_id?: string
+          question?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "queries_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
