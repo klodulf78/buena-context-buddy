@@ -8,6 +8,7 @@ import { AskModal } from "@/components/AskModal";
 
 type Property = {
   id: string;
+  property_id: string;
   name: string;
   address: string;
   last_run_at: string | null;
@@ -23,7 +24,7 @@ const PropertyDetail = () => {
     if (!id) return;
     supabase
       .from("properties")
-      .select("id, name, address, last_run_at")
+      .select("id, property_id, name, address, last_run_at")
       .eq("id", id)
       .maybeSingle()
       .then(({ data }) => {
@@ -90,7 +91,7 @@ const PropertyDetail = () => {
             <AskModal
               open={open}
               onOpenChange={setOpen}
-              propertyId={property.id}
+              propertyId={property.property_id}
             />
           </>
         )}
