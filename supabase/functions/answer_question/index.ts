@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
           type: "text",
           text: SYSTEM_PROMPT,
           cache_control: { type: "ephemeral" },
-        },
+        } as any,
       ],
       messages: [
         {

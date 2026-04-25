@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
           type: "text",
           text: SYSTEM_PROMPT,
           cache_control: { type: "ephemeral" },
-        },
+        } as any,
       ],
       messages: [
         {
@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
               type: "text",
               text: `# Raw corpus for ${property_id}\n\n${bundle}`,
               cache_control: { type: "ephemeral" },
-            },
+            } as any,
             {
               type: "text",
               text: `# Question\n\n${question}`,
