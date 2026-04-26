@@ -351,7 +351,7 @@ const Home = () => {
     <section className="space-y-10">
       <PageHeader
         eyebrow="Benchmark"
-        title="Same question. Two architectures. One winner."
+        title="Same question. Two approaches. One winner."
       />
 
       <div className="mx-auto flex w-full max-w-5xl items-center gap-3">
@@ -367,7 +367,7 @@ const Home = () => {
           size="lg"
           className="h-11 shrink-0 px-6 text-base"
         >
-          {anyRunning ? "Running…" : "Run race"}
+          {anyRunning ? "Running…" : "Run benchmark"}
         </Button>
       </div>
 
