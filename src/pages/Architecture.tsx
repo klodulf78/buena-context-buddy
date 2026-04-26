@@ -16,22 +16,24 @@ const FlowDiagram = () => {
   const totalSourcesW = SOURCES.length * sourceW + (SOURCES.length - 1) * sourceGap;
   const sourcesStartX = (1100 - totalSourcesW) / 2;
 
-  // Engine box
-  const engineX = 350;
+  // Engine box — wider so the long subtitle line fits comfortably
+  const engineW = 560;
+  const engineH = 130;
+  const engineX = (1100 - engineW) / 2; // centered
   const engineY = 240;
-  const engineW = 400;
-  const engineH = 110;
 
-  // Output row
-  const outY = 470;
+  // Output row — pushed further down and spread apart so the curved
+  // "Aggregation Bus" arrow + label has clear vertical space and doesn't
+  // overlap the tiles or arrows.
+  const outY = 540;
   const outH = 70;
-  const propX = 170;
-  const unitX = 620;
-  const outW = 310;
+  const outW = 320;
+  const propX = 70;
+  const unitX = 1100 - 70 - outW; // 710
 
   return (
     <svg
-      viewBox="0 0 1100 620"
+      viewBox="0 0 1100 700"
       className="w-full"
       role="img"
       aria-label="context.md architecture diagram"
