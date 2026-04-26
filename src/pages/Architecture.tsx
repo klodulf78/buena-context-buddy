@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/PageHeader";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Play, Pause } from "lucide-react";
 
 const SOURCES = ["emails/", "bank/", "briefe/", "rechnungen/", "stammdaten/"];
 const AGENTS = ["Repair Triage", "Dunning", "Owner Reports", "Compliance Watch"];
@@ -201,6 +201,8 @@ const Architecture = () => {
     document.title = "context.md Demo — Architecture";
   }, []);
 
+  const [animOn, setAnimOn] = useState(false);
+
   return (
     <section className="space-y-10">
       <PageHeader
@@ -208,8 +210,99 @@ const Architecture = () => {
         title="How context.md stays cheap as it scales"
       />
 
-      <Card className="border-border bg-card p-4 lg:p-6">
-        <FlowDiagram />
+      <Card className="border-border bg-card p-4 lg:p-6 relative">
+        {/* Additive overlay: animation toggle. Positioned outside the diagram. */}
+        <button
+          type="button"
+          onClick={() => setAnimOn((v) => !v)}
+          className="absolute right-4 top-4 z-10 text-xs text-gray-500 hover:text-blue-600 flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-gray-200 bg-white"
+          aria-pressed={animOn}
+        >
+          {animOn ? (
+            <Pause className="w-3.5 h-3.5" strokeWidth={1.75} />
+          ) : (
+            <Play className="w-3.5 h-3.5" strokeWidth={1.75} />
+          )}
+          {animOn ? "Stop animation" : "Play animation"}
+        </button>
+
+        {/* Additive overlay: keyframes that activate only when .arch-anim-on
+            wraps the diagram. Targets are matched via structural selectors so
+            no existing element's className is modified. */}
+        <style>{`
+          @keyframes arch-ring-soft {
+            0%   { box-shadow: 0 0 0 0 hsl(221 83% 53% / 0); }
+            30%  { box-shadow: 0 0 0 4px hsl(221 83% 53% / 0.55); }
+            100% { box-shadow: 0 0 0 0 hsl(221 83% 53% / 0); }
+          }
+          @keyframes arch-ring-strong {
+            0%   { box-shadow: 0 0 0 0 hsl(221 83% 53% / 0); }
+            30%  { box-shadow: 0 0 0 6px hsl(221 83% 53% / 0.6); }
+            100% { box-shadow: 0 0 0 0 hsl(221 83% 53% / 0); }
+          }
+          @keyframes arch-ring-agent {
+            0%, 100% { box-shadow: 0 0 0 0 hsl(221 83% 53% / 0); }
+            50%      { box-shadow: 0 0 0 3px hsl(221 83% 53% / 0.7); }
+          }
+          @keyframes arch-flash-anno {
+            0%, 100% { opacity: 1; }
+            50%      { opacity: 0.5; }
+          }
+
+          /* BUILD pulse — runs once: source → engine → substrate.
+             Total cycle 3s, then we let the agent loop continue indefinitely. */
+
+          /* First source pill (emails/) */
+          .arch-anim-on > div > section:last-child > div > div:first-child {
+            animation: arch-ring-soft 600ms ease-out 0ms 1;
+          }
+
+          /* Engine box */
+          .arch-anim-on > div > section:nth-last-child(3) > div {
+            animation: arch-ring-soft 600ms ease-out 900ms 1;
+          }
+
+          /* Substrate Card (Tier 3) */
+          .arch-anim-on > div > section:nth-child(3) > div {
+            animation: arch-ring-strong 700ms ease-out 1800ms 1;
+          }
+
+          /* READ pulses — each agent rings in turn, looping every 2.4s after
+             build (4 agents × 600ms each). Annotation flashes alongside. */
+          .arch-anim-on > div > section:first-child > div > div:nth-child(1) {
+            animation: arch-ring-agent 200ms ease-in-out 2700ms infinite;
+            animation-duration: 200ms;
+          }
+          .arch-anim-on > div > section:first-child > div > div:nth-child(2) {
+            animation: arch-ring-agent 200ms ease-in-out 3300ms infinite;
+          }
+          .arch-anim-on > div > section:first-child > div > div:nth-child(3) {
+            animation: arch-ring-agent 200ms ease-in-out 3900ms infinite;
+          }
+          .arch-anim-on > div > section:first-child > div > div:nth-child(4) {
+            animation: arch-ring-agent 200ms ease-in-out 4500ms infinite;
+          }
+          /* Stagger the loop — give every agent a 2400ms cycle */
+          .arch-anim-on > div > section:first-child > div > div:nth-child(1),
+          .arch-anim-on > div > section:first-child > div > div:nth-child(2),
+          .arch-anim-on > div > section:first-child > div > div:nth-child(3),
+          .arch-anim-on > div > section:first-child > div > div:nth-child(4) {
+            animation-iteration-count: infinite;
+          }
+
+          /* "$0.02 per query…" annotation flashes on every agent ring */
+          .arch-anim-on > div > section:first-child > p {
+            animation: arch-flash-anno 600ms ease-in-out 2700ms infinite;
+          }
+        `}</style>
+
+        {animOn ? (
+          <div className="arch-anim-on">
+            <FlowDiagram />
+          </div>
+        ) : (
+          <FlowDiagram />
+        )}
       </Card>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
