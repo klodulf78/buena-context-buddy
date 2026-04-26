@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { CitationMarkdown, type CitationMap } from "@/components/CitationMarkdown";
 
 type RunStatus = "idle" | "running" | "done";
 
@@ -41,6 +42,37 @@ const AGENTS: AgentSpec[] = [
 
 const DEFAULT_QUESTION =
   "Is tenant Trub in arrears? Summarize the situation and cite sources.";
+
+const MD_CITATIONS: CitationMap = {
+  bank: "bank/kontoauszug_2024_2025.csv (23 monthly Mietzahlungen €1.206)",
+  mahn: "briefe/2024-11/20241116_mahnung_LTR-0043.pdf.txt (Stage 1, false-positive)",
+  "em-mm": "emails/2025-*/Mietminderung Ankuendigung*.eml (4 mails + 1 reply)",
+  "em-ws": "emails/2025-08/Wasserschaden Bad*.eml (3 + 1 reply)",
+  "em-sm": "emails/2025-*/Schimmel im Schlafzimmer*.eml (3 + 2 replies)",
+};
+
+const MD_ANSWER = `**Tenant:** Frau Jasmin Trub (\`MIE-025\`), unit \`EH-019\` (WE 19, HAUS-14)
+
+**Status:** No active dunning. Lease cancelled by tenant on 2025-07-16; move-out date in negotiation.
+
+**Payment history:** 23 consecutive monthly payments €1.206 (Kaltmiete €1.031 + NK €175) since 2024-01, latest 2025-12-01 [^bank].
+
+**Historical Mahnverfahren:** 1× Stage-1 letter sent 2024-11-16 for Miete 11/2024 [^mahn] — but tenant had paid on 2024-11-01 [^bank] → likely false-positive. Resolved.
+
+**Active concerns (HITL):**
+
+- Mietminderung announced (unilateral) — pending agreement [^em-mm]
+- 2 critical open tickets: Wasserschaden + Schimmel — both with Sanitär Schulze [^em-ws][^em-sm]
+
+**Sources:** [^bank], [^mahn], [^em-mm], [^em-ws], [^em-sm] — all in \`context.unit.EH-019.md §5\`
+`;
+
+const RAW_ANSWER = `Based on my analysis of the property files for the Buena demo dataset, tenant Jasmin Trub at unit EH-019 appears to have a complex situation. Reviewing the bank statement export I can see that monthly rent payments of approximately 1206 EUR have been received from her IBAN starting in early 2024 and continuing through December 2025. There was a dunning letter sent in November 2024 referencing missed rent for that month, however the bank record indicates a payment was received on the first of November 2024.
+
+The tenant has communicated multiple times via email regarding maintenance issues including water damage in the bathroom, mold in the bedroom, and various other repair requests. There are also messages indicating a notice of intent to terminate the lease and announce a rent reduction.
+
+Without specific source citations, I would estimate the tenant is currently not in arrears, but there are pending issues that may affect the lease relationship. Please verify with the original documents.
+`;
 
 type AgentState = {
   status: RunStatus;
@@ -173,7 +205,7 @@ const AgentPane = ({
 
       <StatusDot status={state.status} />
 
-      <div className="min-h-[320px] rounded-md border border-border bg-background p-5">
+       <div className="min-h-[420px] rounded-md border border-border bg-background p-7">
         {state.status !== "done" || !state.answer ? (
           <p className="font-mono text-sm text-gray-400">
             {state.status === "running" ? "Awaiting response…" : "No answer yet."}
@@ -181,11 +213,16 @@ const AgentPane = ({
         ) : (
           <div
             className={cn(
-              "prose prose-base max-w-none text-lg leading-relaxed text-foreground transition-opacity duration-700",
+              "prose prose-lg max-w-none text-lg leading-[1.75] text-foreground transition-opacity duration-700",
+              "prose-p:my-3 prose-li:my-1.5 prose-headings:text-foreground prose-strong:text-foreground prose-strong:font-semibold",
               state.showAnswer ? "opacity-100" : "opacity-0",
             )}
           >
-            <ReactMarkdown>{state.answer}</ReactMarkdown>
+            {agent.id === "md" ? (
+              <CitationMarkdown citations={MD_CITATIONS}>{state.answer}</CitationMarkdown>
+            ) : (
+              <ReactMarkdown>{state.answer}</ReactMarkdown>
+            )}
           </div>
         )}
       </div>
@@ -291,19 +328,18 @@ const Home = () => {
   const bothDone = states.md.status === "done" && states.raw.status === "done";
   const anyRunning = states.md.status === "running" || states.raw.status === "running";
 
-  // Placeholder answers — will be replaced by user-provided markdown.
-  const placeholderAnswers: Record<AgentSpec["id"], string> = {
-    md: "_Answer will go here._",
-    raw: "_Answer will go here._",
+  const finalAnswers: Record<AgentSpec["id"], string> = {
+    md: MD_ANSWER,
+    raw: RAW_ANSWER,
   };
 
-  // Inject placeholder answers when each agent finishes, only if not already set.
+  // Inject answers when each agent finishes, only if not already set.
   useEffect(() => {
-    (Object.keys(placeholderAnswers) as AgentSpec["id"][]).forEach((id) => {
+    (Object.keys(finalAnswers) as AgentSpec["id"][]).forEach((id) => {
       if (states[id].status === "done" && !states[id].answer) {
         setStates((prev) => ({
           ...prev,
-          [id]: { ...prev[id], answer: placeholderAnswers[id] },
+          [id]: { ...prev[id], answer: finalAnswers[id] },
         }));
       }
     });
