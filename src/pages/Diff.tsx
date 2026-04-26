@@ -39,8 +39,8 @@ type MdLine = {
 };
 
 const BASE_LINES: MdLine[] = [
-  { key: "l132", lineNo: 132, text: "lease_id: LEASE-MIE-025", kind: "context" },
-  { key: "l133", lineNo: 133, text: "lease:", kind: "context" },
+  { key: "l132", lineNo: 132, text: "lease:", kind: "context" },
+  { key: "l133", lineNo: 133, text: "  lease_id: LEASE-MIE-025", kind: "context" },
   { key: "l134", lineNo: 134, text: "  start_date: 2022-07-13", kind: "context" },
   { key: "l135", lineNo: 135, text: "  term_type: unbefristet", kind: "context" },
   { key: "l136", lineNo: 136, text: "  rent_components:", kind: "context" },
