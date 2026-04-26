@@ -125,7 +125,7 @@ const FlowDiagram = () => {
                 </marker>
               </defs>
               <path
-                d="M 540 6 C 540 38, 60 38, 60 8"
+                d="M 540 8 C 540 38, 60 38, 60 8"
                 fill="none"
                 stroke="hsl(221 83% 53%)"
                 strokeWidth={1.5}
