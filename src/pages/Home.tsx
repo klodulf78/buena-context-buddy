@@ -28,7 +28,7 @@ const AGENTS: AgentSpec[] = [
     subtitle: "reads context.md only",
     finalCost: 0.02,
     finalLatency: 1.0,
-    durationMs: 4000,
+    durationMs: 1000,
   },
   {
     id: "raw",
@@ -36,7 +36,7 @@ const AGENTS: AgentSpec[] = [
     subtitle: "reads all raw files",
     finalCost: 0.52,
     finalLatency: 18.5,
-    durationMs: 25000,
+    durationMs: 18500,
     costWaypoints: [0.1, 0.25, 0.4],
   },
 ];
@@ -307,10 +307,10 @@ const Home = () => {
             ...prev[agent.id],
             status: "running",
             cost: agent.finalCost * p,
-            latency: agent.finalLatency * p,
+            latency: elapsed / 1000,
           },
         }));
-      }, 50);
+      }, 100);
       intervalsRef.current.push(intervalId);
     });
   };
