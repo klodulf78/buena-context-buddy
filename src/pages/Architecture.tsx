@@ -221,14 +221,20 @@ const FlowDiagram = () => {
         const startY = outY;
         const endX = propX + outW - 30;
         const endY = outY;
-        // Apex of the arc — kept comfortably below the engine box
-        // (engine ends at engineY + engineH = 370) so neither the curve
-        // nor the label collide with arrows or tiles.
-        const apexY = 445;
-        // Cubic control points use a steeper Y to give a smooth, low arc.
-        const ctrlY = apexY - 55;
+        // The label sits as its own card; the arc sits BELOW the label
+        // so both are fully visible and don't overlap.
+        const labelW = 320;
+        const labelH = 56;
+        const labelCx = 1100 / 2;
+        const labelTop = 395; // engine ends at 370 → small gap
+        const labelBottom = labelTop + labelH; // 451
+        // Arc apex sits a bit below the label bottom.
+        const apexY = labelBottom + 30; // 481
+        const ctrlY = apexY - 50;
         return (
           <>
+            {/* Curved arrow first so the label card paints on top if they
+                ever brush each other. */}
             <path
               d={`M ${startX} ${startY} C ${startX - 50} ${ctrlY}, ${endX + 50} ${ctrlY}, ${endX} ${endY - 4}`}
               fill="none"
@@ -236,45 +242,34 @@ const FlowDiagram = () => {
               strokeWidth={1.5}
               markerEnd="url(#arrow-accent)"
             />
-            {/* Label sits just above the arc apex, with a soft white
-                background pill so it never visually collides with the
-                stroke. */}
-            {(() => {
-              const labelCx = (startX + endX) / 2;
-              const labelCy = apexY - 6;
-              const labelW = 360;
-              const labelH = 50;
-              return (
-                <>
-                  <rect
-                    x={labelCx - labelW / 2}
-                    y={labelCy - labelH / 2}
-                    width={labelW}
-                    height={labelH}
-                    rx={8}
-                    fill="hsl(0 0% 100%)"
-                  />
-                  <text
-                    x={labelCx}
-                    y={labelCy - 4}
-                    textAnchor="middle"
-                    className="fill-primary"
-                    style={{ font: "600 15px Inter, sans-serif" }}
-                  >
-                    Aggregation Bus
-                  </text>
-                  <text
-                    x={labelCx}
-                    y={labelCy + 16}
-                    textAnchor="middle"
-                    className="fill-gray-500"
-                    style={{ font: "400 13px Inter, sans-serif" }}
-                  >
-                    deterministic events · ~80% no LLM
-                  </text>
-                </>
-              );
-            })()}
+            {/* Label card — sits above the arc so they never overlap. */}
+            <rect
+              x={labelCx - labelW / 2}
+              y={labelTop}
+              width={labelW}
+              height={labelH}
+              rx={10}
+              className="fill-primary/10 stroke-primary/30"
+              strokeWidth={1}
+            />
+            <text
+              x={labelCx}
+              y={labelTop + 22}
+              textAnchor="middle"
+              className="fill-primary"
+              style={{ font: "600 15px Inter, sans-serif" }}
+            >
+              Aggregation Bus
+            </text>
+            <text
+              x={labelCx}
+              y={labelTop + 42}
+              textAnchor="middle"
+              className="fill-gray-500"
+              style={{ font: "400 13px Inter, sans-serif" }}
+            >
+              deterministic events · ~80% no LLM
+            </text>
           </>
         );
       })()}
