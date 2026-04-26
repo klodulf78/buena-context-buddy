@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/PageHeader";
 
 type TileStatus = "live" | "soon";
 
@@ -167,14 +168,10 @@ const Gallery = () => {
 
   return (
     <section className="space-y-8">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Use-Case Gallery
-        </h1>
-        <p className="text-sm text-gray-500">
-          Every workflow runs on the same context.md substrate.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Use-Case Gallery"
+        title="Every workflow runs on the same context.md substrate."
+      />
 
       <p className="font-mono text-sm text-gray-500">
         {liveCount} of {TILES.length} live · {soonCount} in roadmap
