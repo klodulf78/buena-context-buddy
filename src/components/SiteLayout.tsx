@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useDemoMode } from "@/hooks/useDemoMode";
 
 const navItems = [
   { to: "/", label: "Home", end: true },
@@ -9,9 +10,11 @@ const navItems = [
 ];
 
 const SiteLayout = () => {
+  const demoMode = useDemoMode();
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
+      {!demoMode && (
+        <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6">
           <NavLink to="/" className="font-mono text-base font-semibold tracking-tight text-foreground">
             context.md
@@ -36,7 +39,8 @@ const SiteLayout = () => {
             ))}
           </nav>
         </div>
-      </header>
+        </header>
+      )}
       <main className="mx-auto max-w-7xl px-6 py-12 lg:py-16">
         <Outlet />
       </main>
