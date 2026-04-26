@@ -307,10 +307,10 @@ const Home = () => {
             ...prev[agent.id],
             status: "running",
             cost: agent.finalCost * p,
-            latency: agent.finalLatency * p,
+            latency: elapsed / 1000,
           },
         }));
-      }, 50);
+      }, 100);
       intervalsRef.current.push(intervalId);
     });
   };
