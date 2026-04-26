@@ -43,6 +43,37 @@ const AGENTS: AgentSpec[] = [
 const DEFAULT_QUESTION =
   "Is tenant Trub in arrears? Summarize the situation and cite sources.";
 
+const MD_CITATIONS: CitationMap = {
+  bank: "bank/kontoauszug_2024_2025.csv (23 monthly Mietzahlungen €1.206)",
+  mahn: "briefe/2024-11/20241116_mahnung_LTR-0043.pdf.txt (Stage 1, false-positive)",
+  "em-mm": "emails/2025-*/Mietminderung Ankuendigung*.eml (4 mails + 1 reply)",
+  "em-ws": "emails/2025-08/Wasserschaden Bad*.eml (3 + 1 reply)",
+  "em-sm": "emails/2025-*/Schimmel im Schlafzimmer*.eml (3 + 2 replies)",
+};
+
+const MD_ANSWER = `**Tenant:** Frau Jasmin Trub (\`MIE-025\`), unit \`EH-019\` (WE 19, HAUS-14)
+
+**Status:** No active dunning. Lease cancelled by tenant on 2025-07-16; move-out date in negotiation.
+
+**Payment history:** 23 consecutive monthly payments €1.206 (Kaltmiete €1.031 + NK €175) since 2024-01, latest 2025-12-01 [^bank].
+
+**Historical Mahnverfahren:** 1× Stage-1 letter sent 2024-11-16 for Miete 11/2024 [^mahn] — but tenant had paid on 2024-11-01 [^bank] → likely false-positive. Resolved.
+
+**Active concerns (HITL):**
+
+- Mietminderung announced (unilateral) — pending agreement [^em-mm]
+- 2 critical open tickets: Wasserschaden + Schimmel — both with Sanitär Schulze [^em-ws][^em-sm]
+
+**Sources:** [^bank], [^mahn], [^em-mm], [^em-ws], [^em-sm] — all in \`context.unit.EH-019.md §5\`
+`;
+
+const RAW_ANSWER = `Based on my analysis of the property files for the Buena demo dataset, tenant Jasmin Trub at unit EH-019 appears to have a complex situation. Reviewing the bank statement export I can see that monthly rent payments of approximately 1206 EUR have been received from her IBAN starting in early 2024 and continuing through December 2025. There was a dunning letter sent in November 2024 referencing missed rent for that month, however the bank record indicates a payment was received on the first of November 2024.
+
+The tenant has communicated multiple times via email regarding maintenance issues including water damage in the bathroom, mold in the bedroom, and various other repair requests. There are also messages indicating a notice of intent to terminate the lease and announce a rent reduction.
+
+Without specific source citations, I would estimate the tenant is currently not in arrears, but there are pending issues that may affect the lease relationship. Please verify with the original documents.
+`;
+
 type AgentState = {
   status: RunStatus;
   cost: number;
