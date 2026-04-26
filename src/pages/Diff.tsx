@@ -39,17 +39,18 @@ type MdLine = {
 };
 
 const BASE_LINES: MdLine[] = [
-  { key: "l132", lineNo: 132, text: "lease:", kind: "context" },
-  { key: "l133", lineNo: 133, text: "  start_date: 2024-01-01", kind: "context" },
-  { key: "l134", lineNo: 134, text: "  contract_type: unbefristet", kind: "context" },
-  { key: "l135", lineNo: 135, text: "  rent_components:", kind: "context" },
-  { key: "l136", lineNo: 136, text: "    - kaltmiete: €1.031", kind: "context" },
-  { key: "l137", lineNo: 137, text: "    - betriebskosten_vorauszahlung: €175", kind: "context" },
-  { key: "l138", lineNo: 138, text: "    - total_warmmiete: €1.206", kind: "context" },
-  { key: "l139", lineNo: 139, text: "  deposit: €3.093 (3× Kaltmiete)", kind: "context" },
-  { key: "l140", lineNo: 140, text: "  cancellation_status: none", kind: "context" },
-  { key: "l141", lineNo: 141, text: "  special_agreements: []", kind: "context" },
-  { key: "l142", lineNo: 142, text: "  subletting: { permitted: case-by-case }", kind: "context" },
+  { key: "l132", lineNo: 132, text: "lease_id: LEASE-MIE-025", kind: "context" },
+  { key: "l133", lineNo: 133, text: "lease:", kind: "context" },
+  { key: "l134", lineNo: 134, text: "  start_date: 2022-07-13", kind: "context" },
+  { key: "l135", lineNo: 135, text: "  term_type: unbefristet", kind: "context" },
+  { key: "l136", lineNo: 136, text: "  rent_components:", kind: "context" },
+  { key: "l137", lineNo: 137, text: "    - kaltmiete: €1.031", kind: "context" },
+  { key: "l138", lineNo: 138, text: "    - betriebskosten_vorauszahlung: €175", kind: "context" },
+  { key: "l139", lineNo: 139, text: "    - total_warmmiete: €1.206", kind: "context" },
+  { key: "l140", lineNo: 140, text: "  kaution: { amount: €3.093, form: tbd, paid_status: paid }", kind: "context" },
+  { key: "l141", lineNo: 141, text: "  cancellation_status: none", kind: "context" },
+  { key: "l142", lineNo: 142, text: "  special_agreements: []", kind: "context" },
+  { key: "l143", lineNo: 143, text: "  subletting: { permitted: case-by-case, current_status: denied }", kind: "context" },
 ];
 
 const Row = ({ line, animateIn }: { line: MdLine; animateIn: boolean }) => {
@@ -153,55 +154,55 @@ const Diff = () => {
     schedule(700, () => setVisibleLogs(2));
     schedule(1200, () => setVisibleLogs(3));
 
-    // t=1600ms — flash line 140 yellow
+    // t=1600ms — flash line 141 yellow
     schedule(1600, () => {
       setLines((prev) =>
-        prev.map((l) => (l.key === "l140" ? { ...l, flash: true } : l)),
+        prev.map((l) => (l.key === "l141" ? { ...l, flash: true } : l)),
       );
     });
 
-    // t=1900ms — turn line 140 into a "remove" + insert 3 new "add" lines below it
+    // t=1900ms — turn line 141 into a "remove" + insert 3 new "add" lines below it
     schedule(1900, () => {
       setLines((prev) => {
         const out: MdLine[] = [];
         for (const l of prev) {
-          if (l.key === "l140") {
+          if (l.key === "l141") {
             out.push({ ...l, flash: false, kind: "remove" });
-            out.push({
-              key: "n140",
-              lineNo: 140,
-              text: "  cancellation_status: by_tenant [^k1]",
-              kind: "add",
-            });
             out.push({
               key: "n141",
               lineNo: 141,
-              text: "    - notice_date: 2025-07-16",
+              text: "  cancellation_status: by_tenant [^k1]",
               kind: "add",
             });
             out.push({
               key: "n142",
               lineNo: 142,
-              text: "    - move_out_date: TBD (Übergabe in Verhandlung)",
+              text: "    - notice_date: 2025-07-16",
               kind: "add",
             });
             out.push({
               key: "n143",
               lineNo: 143,
+              text: "    - move_out_date: TBD (Übergabe in Verhandlung)",
+              kind: "add",
+            });
+            out.push({
+              key: "n144",
+              lineNo: 144,
               text: "    - remaining_rents: TBD",
               kind: "add",
             });
-          } else if (l.key === "l141") {
-            out.push({ ...l, lineNo: 144 });
           } else if (l.key === "l142") {
             out.push({ ...l, lineNo: 145 });
+          } else if (l.key === "l143") {
+            out.push({ ...l, lineNo: 146 });
           } else {
             out.push(l);
           }
         }
         return out;
       });
-      setAnimatedKeys(new Set(["n140", "n141", "n142", "n143"]));
+      setAnimatedKeys(new Set(["n141", "n142", "n143", "n144"]));
     });
 
     // t=2600ms — pill becomes Extracted with pulse
