@@ -5,9 +5,11 @@
 export const PageHeader = ({
   eyebrow,
   title,
+  titleClassName,
 }: {
   eyebrow: string;
   title: string;
+  titleClassName?: string;
 }) => (
   <header className="flex flex-col gap-3 pb-8 lg:pb-12">
     <div className="flex items-center">
@@ -16,7 +18,12 @@ export const PageHeader = ({
         {eyebrow}
       </span>
     </div>
-    <h1 className="max-w-[800px] text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl">
+    <h1
+      className={
+        titleClassName ??
+        "max-w-[800px] text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl"
+      }
+    >
       {title}
     </h1>
   </header>
