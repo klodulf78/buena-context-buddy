@@ -328,19 +328,18 @@ const Home = () => {
   const bothDone = states.md.status === "done" && states.raw.status === "done";
   const anyRunning = states.md.status === "running" || states.raw.status === "running";
 
-  // Placeholder answers — will be replaced by user-provided markdown.
-  const placeholderAnswers: Record<AgentSpec["id"], string> = {
-    md: "_Answer will go here._",
-    raw: "_Answer will go here._",
+  const finalAnswers: Record<AgentSpec["id"], string> = {
+    md: MD_ANSWER,
+    raw: RAW_ANSWER,
   };
 
-  // Inject placeholder answers when each agent finishes, only if not already set.
+  // Inject answers when each agent finishes, only if not already set.
   useEffect(() => {
-    (Object.keys(placeholderAnswers) as AgentSpec["id"][]).forEach((id) => {
+    (Object.keys(finalAnswers) as AgentSpec["id"][]).forEach((id) => {
       if (states[id].status === "done" && !states[id].answer) {
         setStates((prev) => ({
           ...prev,
-          [id]: { ...prev[id], answer: placeholderAnswers[id] },
+          [id]: { ...prev[id], answer: finalAnswers[id] },
         }));
       }
     });
