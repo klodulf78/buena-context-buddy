@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { CitationMarkdown, type CitationMap } from "@/components/CitationMarkdown";
+import { PageHeader } from "@/components/PageHeader";
 
 type RunStatus = "idle" | "running" | "done";
 
@@ -348,14 +349,10 @@ const Home = () => {
 
   return (
     <section className="space-y-10">
-      <header className="space-y-1 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          MD-Agent vs Raw-Claude — Race
-        </h1>
-        <p className="text-sm text-gray-500">
-          Same property question, two architectures, side by side
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Benchmark"
+        title="Same question. Two architectures. One winner."
+      />
 
       <div className="mx-auto flex w-full max-w-5xl items-center gap-3">
         <Input

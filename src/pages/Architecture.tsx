@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/PageHeader";
 
 const SOURCES = ["emails/", "bank/", "briefe/", "rechnungen/", "stammdaten/"];
 const AGENTS = ["Repair Triage", "Dunning", "Owner Reports", "Compliance Watch"];
@@ -209,10 +210,10 @@ const Architecture = () => {
 
   return (
     <section className="space-y-12">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Architecture</h1>
-        <p className="text-sm text-gray-500">How context.md stays cheap as it scales</p>
-      </header>
+      <PageHeader
+        eyebrow="Architecture"
+        title="How context.md stays cheap as it scales"
+      />
 
       <Card className="border-border bg-card p-6 lg:p-10">
         <FlowDiagram />

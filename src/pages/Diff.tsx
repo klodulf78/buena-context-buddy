@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { RotateCcw, FolderOpen, FilePlus2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/PageHeader";
 
 type DiffLine =
   | { kind: "context"; lineNo: number; text: string }
@@ -119,24 +120,20 @@ const Diff = () => {
 
   return (
     <section className="space-y-8">
-      <header className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Surgical Update
-          </h1>
-          <p className="text-sm text-gray-500">
-            A new file was dropped into the watch folder. The engine updated only the affected line.
-          </p>
-        </div>
+      <div className="flex items-start justify-between gap-4">
+        <PageHeader
+          eyebrow="Surgical Update"
+          title="A new file dropped — only one line changed."
+        />
         <button
           type="button"
           onClick={replay}
-          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs text-gray-600 transition-colors hover:bg-secondary hover:text-foreground"
+          className="mt-2 inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs text-gray-600 transition-colors hover:bg-secondary hover:text-foreground"
         >
           <RotateCcw className="h-3.5 w-3.5" />
           Replay
         </button>
-      </header>
+      </div>
 
       {/* Watched-folder bar */}
       <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-secondary/60 px-4 py-3">
