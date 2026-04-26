@@ -1,281 +1,186 @@
 import { useEffect } from "react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const SOURCES = ["emails/", "bank/", "briefe/", "rechnungen/", "stammdaten/"];
+const AGENTS = ["Repair Triage", "Dunning", "Owner Reports", "Compliance Watch"];
+
+/** Small label that sits above each tier. */
+const TierLabel = ({ children }: { children: React.ReactNode }) => (
+  <p className="text-center font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-gray-500">
+    {children}
+  </p>
+);
 
 /**
- * Inline SVG flow diagram. Coordinates are designed for a 1100x620 viewBox so
- * the layout stays precise regardless of container size (preserveAspectRatio).
+ * Vertical connector between two tiers. `variant="read"` is accent-colored
+ * (substrate → agents); `variant="build"` is subtle grey (sources → engine →
+ * substrate). The caption sits to the right of the arrow.
  */
-const FlowDiagram = () => {
-  // Layout constants for the source-row boxes
-  const sourceY = 90;
-  const sourceH = 56;
-  const sourceW = 150;
-  const sourceGap = 28;
-  const totalSourcesW = SOURCES.length * sourceW + (SOURCES.length - 1) * sourceGap;
-  const sourcesStartX = (1100 - totalSourcesW) / 2;
-
-  // Engine box — wider so the long subtitle line fits comfortably
-  const engineW = 560;
-  const engineH = 130;
-  const engineX = (1100 - engineW) / 2; // centered
-  const engineY = 240;
-
-  // Output row — pushed further down and spread apart so the curved
-  // "Aggregation Bus" arrow + label has clear vertical space and doesn't
-  // overlap the tiles or arrows.
-  const outY = 540;
-  const outH = 70;
-  const outW = 320;
-  const propX = 70;
-  const unitX = 1100 - 70 - outW; // 710
-
+const TierConnector = ({
+  variant,
+  direction,
+  caption,
+}: {
+  variant: "read" | "build";
+  direction: "down" | "up";
+  caption: string;
+}) => {
+  const colorClass =
+    variant === "read" ? "text-primary" : "text-gray-400";
+  const Icon = direction === "down" ? ArrowDown : ArrowUp;
   return (
-    <svg
-      viewBox="0 0 1100 700"
-      className="w-full"
-      role="img"
-      aria-label="context.md architecture diagram"
-    >
-      <defs>
-        <marker
-          id="arrow"
-          viewBox="0 0 10 10"
-          refX="9"
-          refY="5"
-          markerWidth="7"
-          markerHeight="7"
-          orient="auto-start-reverse"
-        >
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="hsl(220 9% 46%)" />
-        </marker>
-        <marker
-          id="arrow-accent"
-          viewBox="0 0 10 10"
-          refX="9"
-          refY="5"
-          markerWidth="7"
-          markerHeight="7"
-          orient="auto-start-reverse"
-        >
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="hsl(221 83% 53%)" />
-        </marker>
-      </defs>
+    <div className="flex items-center justify-center gap-3">
+      <div className={cn("flex flex-col items-center", colorClass)}>
+        <div
+          className={cn(
+            "h-8 w-px",
+            variant === "read" ? "bg-primary/60" : "bg-gray-300",
+          )}
+        />
+        <Icon className="h-4 w-4" strokeWidth={2} />
+      </div>
+      <span className="text-sm italic text-gray-600">{caption}</span>
+    </div>
+  );
+};
 
-      {/* Sources row */}
-      <text
-        x="550"
-        y="50"
-        textAnchor="middle"
-        className="fill-gray-500"
-        style={{ font: "500 13px 'JetBrains Mono', monospace", letterSpacing: "0.14em" }}
-      >
-        SOURCES
-      </text>
-      {SOURCES.map((label, i) => {
-        const x = sourcesStartX + i * (sourceW + sourceGap);
-        return (
-          <g key={label}>
-            <rect
-              x={x}
-              y={sourceY}
-              width={sourceW}
-              height={sourceH}
-              rx={10}
-              className="fill-secondary stroke-border"
-              strokeWidth={1}
-            />
-            <text
-              x={x + sourceW / 2}
-              y={sourceY + sourceH / 2 + 5}
-              textAnchor="middle"
-              className="fill-foreground"
-              style={{ font: "500 15px 'JetBrains Mono', monospace" }}
+/**
+ * Build-pipeline arrow: a slim vertical line with a small arrowhead, used to
+ * connect each source up into the engine box. Pure CSS so it scales with the
+ * surrounding flex layout.
+ */
+const BuildArrowUp = () => (
+  <div className="flex flex-col items-center text-gray-400">
+    <ArrowUp className="h-3.5 w-3.5" strokeWidth={2} />
+    <div className="h-6 w-px bg-gray-300" />
+  </div>
+);
+
+const FlowDiagram = () => {
+  return (
+    <div className="flex flex-col gap-10">
+      {/* TIER 1 — Agents */}
+      <section className="space-y-4">
+        <TierLabel>Agents</TierLabel>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {AGENTS.map((label) => (
+            <div
+              key={label}
+              className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-center"
             >
-              {label}
-            </text>
-          </g>
-        );
-      })}
+              <span className="font-mono text-sm font-medium text-primary">{label}</span>
+            </div>
+          ))}
+        </div>
+        <p className="text-center text-sm italic text-gray-600">
+          $0.02 per query, every query
+        </p>
+      </section>
 
-      {/* Arrows from each source down toward the engine */}
-      {SOURCES.map((_, i) => {
-        const sx = sourcesStartX + i * (sourceW + sourceGap) + sourceW / 2;
-        const sy = sourceY + sourceH;
-        const tx = engineX + engineW / 2;
-        const ty = engineY;
-        // Curved path: drop straight then converge
-        const midY = (sy + ty) / 2;
-        return (
-          <path
-            key={`src-arrow-${i}`}
-            d={`M ${sx} ${sy} C ${sx} ${midY}, ${tx} ${midY}, ${tx} ${ty - 6}`}
-            fill="none"
-            stroke="hsl(220 9% 46%)"
-            strokeWidth={1.25}
-            markerEnd="url(#arrow)"
-            opacity={0.55}
-          />
-        );
-      })}
+      {/* TIER 2 — read pipeline arrow (accent) */}
+      <TierConnector variant="read" direction="down" caption="READ (many times per day)" />
 
-      {/* Engine box */}
-      <rect
-        x={engineX}
-        y={engineY}
-        width={engineW}
-        height={engineH}
-        rx={14}
-        className="fill-primary"
-      />
-      <text
-        x={engineX + engineW / 2}
-        y={engineY + 28}
-        textAnchor="middle"
-        className="fill-primary-foreground"
-        style={{ font: "600 13px 'JetBrains Mono', monospace", letterSpacing: "0.12em" }}
-      >
-        ENGINE
-      </text>
-      <text
-        x={engineX + engineW / 2}
-        y={engineY + 58}
-        textAnchor="middle"
-        className="fill-primary-foreground"
-        style={{ font: "500 17px 'JetBrains Mono', monospace" }}
-      >
-        Per-Source Extractors → Fact Store → MD Builders
-      </text>
-      <text
-        x={engineX + engineW / 2}
-        y={engineY + 88}
-        textAnchor="middle"
-        className="fill-primary-foreground/75"
-        style={{ font: "400 13px Inter, sans-serif" }}
-      >
-        LLM only on new sources
-      </text>
+      {/* TIER 3 — Context substrate (the product, visually dominant) */}
+      <section className="space-y-4">
+        <TierLabel>Context Substrate — the product</TierLabel>
+        <Card className="border-2 border-primary/60 bg-primary/[0.04] p-8 lg:p-10 shadow-sm">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div className="rounded-lg border border-primary/30 bg-background px-5 py-5 text-center">
+              <span className="font-mono text-lg font-semibold text-primary">
+                context.property.LIE-001.md
+              </span>
+            </div>
+            <div className="rounded-lg border border-primary/30 bg-background px-5 py-5 text-center">
+              <span className="font-mono text-lg font-semibold text-primary">
+                context.unit.EH-019.md ×52
+              </span>
+            </div>
+          </div>
 
-      {/* Arrow engine → outputs. Each arrow leaves the engine near its
-          left/right edge and curves directly down to its target tile so
-          it stays clear of the central Aggregation-Bus label. */}
-      <path
-        d={`M ${engineX + 60} ${engineY + engineH} C ${engineX + 60} ${engineY + engineH + 80}, ${propX + outW / 2} ${outY - 80}, ${propX + outW / 2} ${outY - 6}`}
-        fill="none"
-        stroke="hsl(220 9% 46%)"
-        strokeWidth={1.25}
-        markerEnd="url(#arrow)"
-        opacity={0.65}
-      />
-      <path
-        d={`M ${engineX + engineW - 60} ${engineY + engineH} C ${engineX + engineW - 60} ${engineY + engineH + 80}, ${unitX + outW / 2} ${outY - 80}, ${unitX + outW / 2} ${outY - 6}`}
-        fill="none"
-        stroke="hsl(220 9% 46%)"
-        strokeWidth={1.25}
-        markerEnd="url(#arrow)"
-        opacity={0.65}
-      />
-
-      {/* Output: property MD */}
-      <rect
-        x={propX}
-        y={outY}
-        width={outW}
-        height={outH}
-        rx={12}
-        className="fill-primary/10 stroke-primary/30"
-        strokeWidth={1.25}
-      />
-      <text
-        x={propX + outW / 2}
-        y={outY + outH / 2 + 5}
-        textAnchor="middle"
-        className="fill-primary"
-        style={{ font: "600 16px 'JetBrains Mono', monospace" }}
-      >
-        context.property.LIE-001.md
-      </text>
-
-      {/* Output: unit MD */}
-      <rect
-        x={unitX}
-        y={outY}
-        width={outW}
-        height={outH}
-        rx={12}
-        className="fill-primary/10 stroke-primary/30"
-        strokeWidth={1.25}
-      />
-      <text
-        x={unitX + outW / 2}
-        y={outY + outH / 2 + 5}
-        textAnchor="middle"
-        className="fill-primary"
-        style={{ font: "600 16px 'JetBrains Mono', monospace" }}
-      >
-        context.unit.EH-019.md  ×52
-      </text>
-
-      {/* Aggregation bus: curved arrow from unit MD up to property MD */}
-      {(() => {
-        const startX = unitX + 30;
-        const startY = outY;
-        const endX = propX + outW - 30;
-        const endY = outY;
-        // The label sits as its own card; the arc sits BELOW the label
-        // so both are fully visible and don't overlap.
-        const labelW = 320;
-        const labelH = 56;
-        const labelCx = 1100 / 2;
-        const labelTop = 395; // engine ends at 370 → small gap
-        const labelBottom = labelTop + labelH; // 451
-        // Arc apex sits a bit below the label bottom.
-        const apexY = labelBottom + 30; // 481
-        const ctrlY = apexY - 50;
-        return (
-          <>
-            {/* Curved arrow first so the label card paints on top if they
-                ever brush each other. */}
-            <path
-              d={`M ${startX} ${startY} C ${startX - 50} ${ctrlY}, ${endX + 50} ${ctrlY}, ${endX} ${endY - 4}`}
-              fill="none"
-              stroke="hsl(221 83% 53%)"
-              strokeWidth={1.5}
-              markerEnd="url(#arrow-accent)"
-            />
-            {/* Label card — sits above the arc so they never overlap. */}
-            <rect
-              x={labelCx - labelW / 2}
-              y={labelTop}
-              width={labelW}
-              height={labelH}
-              rx={10}
-              className="fill-primary/10 stroke-primary/30"
-              strokeWidth={1}
-            />
-            <text
-              x={labelCx}
-              y={labelTop + 22}
-              textAnchor="middle"
-              className="fill-primary"
-              style={{ font: "600 15px Inter, sans-serif" }}
+          {/* Aggregation Bus — sits below the two MD boxes with a curved
+              accent arrow flowing from unit (right) back up to property (left). */}
+          <div className="relative mt-8 flex justify-center">
+            <svg
+              viewBox="0 0 600 70"
+              className="absolute inset-x-0 top-0 mx-auto h-16 w-full max-w-2xl"
+              preserveAspectRatio="none"
+              aria-hidden="true"
             >
-              Aggregation Bus
-            </text>
-            <text
-              x={labelCx}
-              y={labelTop + 42}
-              textAnchor="middle"
-              className="fill-gray-500"
-              style={{ font: "400 13px Inter, sans-serif" }}
+              <defs>
+                <marker
+                  id="agg-arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="hsl(221 83% 53%)" />
+                </marker>
+              </defs>
+              <path
+                d="M 540 8 C 540 50, 60 50, 60 12"
+                fill="none"
+                stroke="hsl(221 83% 53%)"
+                strokeWidth={1.5}
+                markerEnd="url(#agg-arrow)"
+              />
+            </svg>
+            <div className="relative z-10 mt-12 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-background px-4 py-1.5">
+              <span className="font-mono text-xs font-medium text-primary">
+                Aggregation Bus
+              </span>
+              <span className="text-xs text-gray-500">
+                · deterministic events · ~80% no LLM
+              </span>
+            </div>
+          </div>
+        </Card>
+      </section>
+
+      {/* TIER 4 — build pipeline arrow up into substrate */}
+      <TierConnector variant="build" direction="up" caption="BUILD (once per source change)" />
+
+      {/* TIER 5 — Engine */}
+      <section className="space-y-4">
+        <TierLabel>Engine</TierLabel>
+        <div className="mx-auto max-w-3xl rounded-xl bg-primary px-8 py-6 text-center">
+          <p className="font-mono text-base font-semibold text-primary-foreground sm:text-lg">
+            Per-Source Extractors → Fact Store → MD Builders
+          </p>
+          <p className="mt-1.5 text-sm text-primary-foreground/75">
+            LLM only on new sources
+          </p>
+        </div>
+      </section>
+
+      {/* Build-pipeline arrows from sources up into the engine */}
+      <div className="grid grid-cols-5 gap-3">
+        {SOURCES.map((s) => (
+          <div key={s} className="flex justify-center">
+            <BuildArrowUp />
+          </div>
+        ))}
+      </div>
+
+      {/* TIER 6 — Sources */}
+      <section className="space-y-4">
+        <TierLabel>Sources</TierLabel>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+          {SOURCES.map((s) => (
+            <div
+              key={s}
+              className="rounded-lg border border-border bg-secondary px-3 py-3 text-center"
             >
-              deterministic events · ~80% no LLM
-            </text>
-          </>
-        );
-      })()}
-    </svg>
+              <span className="font-mono text-sm text-foreground">{s}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 };
 
