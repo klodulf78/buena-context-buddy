@@ -234,11 +234,6 @@ const Architecture = () => {
           </Card>
         ))}
       </div>
-
-      <p className="text-base italic text-gray-600">
-        Cost per query stays constant as the platform grows. Every year of data makes raw-data
-        approaches more expensive. MD-Agent stays at two cents.
-      </p>
     </section>
   );
 };
