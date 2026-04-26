@@ -200,11 +200,6 @@ const STATS: { value: string; label: string; sub: string }[] = [
     label: "Annual savings at 1,000 properties",
     sub: "vs raw-data approach",
   },
-  {
-    value: "Flat",
-    label: "Per-query cost as data grows",
-    sub: "raw-data scales with history — we don't",
-  },
 ];
 
 const Architecture = () => {
@@ -223,7 +218,7 @@ const Architecture = () => {
         <FlowDiagram />
       </Card>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {STATS.map((s) => (
           <Card
             key={s.label}
