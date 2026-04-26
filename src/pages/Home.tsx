@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { CitationMarkdown, type CitationMap } from "@/components/CitationMarkdown";
 
 type RunStatus = "idle" | "running" | "done";
 
@@ -173,7 +174,7 @@ const AgentPane = ({
 
       <StatusDot status={state.status} />
 
-      <div className="min-h-[320px] rounded-md border border-border bg-background p-5">
+       <div className="min-h-[420px] rounded-md border border-border bg-background p-7">
         {state.status !== "done" || !state.answer ? (
           <p className="font-mono text-sm text-gray-400">
             {state.status === "running" ? "Awaiting response…" : "No answer yet."}
@@ -181,11 +182,16 @@ const AgentPane = ({
         ) : (
           <div
             className={cn(
-              "prose prose-base max-w-none text-lg leading-relaxed text-foreground transition-opacity duration-700",
+              "prose prose-lg max-w-none text-lg leading-[1.75] text-foreground transition-opacity duration-700",
+              "prose-p:my-3 prose-li:my-1.5 prose-headings:text-foreground prose-strong:text-foreground prose-strong:font-semibold",
               state.showAnswer ? "opacity-100" : "opacity-0",
             )}
           >
-            <ReactMarkdown>{state.answer}</ReactMarkdown>
+            {agent.id === "md" ? (
+              <CitationMarkdown citations={MD_CITATIONS}>{state.answer}</CitationMarkdown>
+            ) : (
+              <ReactMarkdown>{state.answer}</ReactMarkdown>
+            )}
           </div>
         )}
       </div>
