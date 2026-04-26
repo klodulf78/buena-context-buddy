@@ -2,7 +2,7 @@ import { useEffect, type ComponentType } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowUpRight,
-  Banknote,
+  Wallet,
   Calculator,
   CalendarClock,
   DoorOpen,
