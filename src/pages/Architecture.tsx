@@ -157,9 +157,11 @@ const FlowDiagram = () => {
         LLM only on new sources
       </text>
 
-      {/* Arrow engine → outputs (split into two) */}
+      {/* Arrow engine → outputs. Each arrow leaves the engine near its
+          left/right edge and curves directly down to its target tile so
+          it stays clear of the central Aggregation-Bus label. */}
       <path
-        d={`M ${engineX + engineW / 2} ${engineY + engineH} C ${engineX + engineW / 2} ${engineY + engineH + 50}, ${propX + outW / 2} ${outY - 50}, ${propX + outW / 2} ${outY - 6}`}
+        d={`M ${engineX + 60} ${engineY + engineH} C ${engineX + 60} ${engineY + engineH + 80}, ${propX + outW / 2} ${outY - 80}, ${propX + outW / 2} ${outY - 6}`}
         fill="none"
         stroke="hsl(220 9% 46%)"
         strokeWidth={1.25}
@@ -167,7 +169,7 @@ const FlowDiagram = () => {
         opacity={0.65}
       />
       <path
-        d={`M ${engineX + engineW / 2} ${engineY + engineH} C ${engineX + engineW / 2} ${engineY + engineH + 50}, ${unitX + outW / 2} ${outY - 50}, ${unitX + outW / 2} ${outY - 6}`}
+        d={`M ${engineX + engineW - 60} ${engineY + engineH} C ${engineX + engineW - 60} ${engineY + engineH + 80}, ${unitX + outW / 2} ${outY - 80}, ${unitX + outW / 2} ${outY - 6}`}
         fill="none"
         stroke="hsl(220 9% 46%)"
         strokeWidth={1.25}
