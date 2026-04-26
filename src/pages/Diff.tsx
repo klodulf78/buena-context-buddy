@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/PageHeader";
 
-type Phase = "idle" | "logs" | "diff" | "done";
+type Phase = "idle" | "running" | "done";
 
 const SOURCE_LETTER = `Sehr geehrte Damen und Herren,
 
@@ -27,55 +27,50 @@ const LOG_LINES = [
   "patched 1 line, +3 added · human-edits preserved",
 ];
 
-type DiffLine =
-  | { kind: "context"; lineNo: number; text: string }
-  | { kind: "remove"; lineNo: number; text: string }
-  | { kind: "add"; lineNo: number; text: string };
+type LineKind = "context" | "remove" | "add";
 
-const DIFF_LINES: DiffLine[] = [
-  { kind: "context", lineNo: 132, text: "lease:" },
-  { kind: "context", lineNo: 133, text: "  start_date: 2024-01-01" },
-  { kind: "context", lineNo: 134, text: "  contract_type: unbefristet" },
-  { kind: "context", lineNo: 135, text: "  rent_components:" },
-  { kind: "context", lineNo: 136, text: "    - kaltmiete: €1.031" },
-  { kind: "context", lineNo: 137, text: "    - betriebskosten_vorauszahlung: €175" },
-  { kind: "context", lineNo: 138, text: "    - total_warmmiete: €1.206" },
-  { kind: "context", lineNo: 139, text: "  deposit: €3.093 (3× Kaltmiete)" },
-  { kind: "remove", lineNo: 140, text: "  cancellation_status: none" },
-  { kind: "add", lineNo: 140, text: "  cancellation_status: by_tenant [^k1]" },
-  { kind: "add", lineNo: 141, text: "    - notice_date: 2025-07-16" },
-  { kind: "add", lineNo: 142, text: "    - move_out_date: TBD (Übergabe in Verhandlung)" },
-  { kind: "add", lineNo: 143, text: "    - remaining_rents: TBD" },
-  { kind: "context", lineNo: 144, text: "  special_agreements: []" },
-  { kind: "context", lineNo: 145, text: "  subletting: { permitted: case-by-case }" },
+type MdLine = {
+  key: string;
+  lineNo: number;
+  text: string;
+  kind: LineKind;
+  // visual stage for animated rows
+  flash?: boolean; // brief yellow flash before settling
+};
+
+const BASE_LINES: MdLine[] = [
+  { key: "l132", lineNo: 132, text: "lease:", kind: "context" },
+  { key: "l133", lineNo: 133, text: "  start_date: 2024-01-01", kind: "context" },
+  { key: "l134", lineNo: 134, text: "  contract_type: unbefristet", kind: "context" },
+  { key: "l135", lineNo: 135, text: "  rent_components:", kind: "context" },
+  { key: "l136", lineNo: 136, text: "    - kaltmiete: €1.031", kind: "context" },
+  { key: "l137", lineNo: 137, text: "    - betriebskosten_vorauszahlung: €175", kind: "context" },
+  { key: "l138", lineNo: 138, text: "    - total_warmmiete: €1.206", kind: "context" },
+  { key: "l139", lineNo: 139, text: "  deposit: €3.093 (3× Kaltmiete)", kind: "context" },
+  { key: "l140", lineNo: 140, text: "  cancellation_status: none", kind: "context" },
+  { key: "l141", lineNo: 141, text: "  special_agreements: []", kind: "context" },
+  { key: "l142", lineNo: 142, text: "  subletting: { permitted: case-by-case }", kind: "context" },
 ];
 
-const DiffRow = ({
-  line,
-  highlight,
-}: {
-  line: DiffLine;
-  highlight: boolean;
-}) => {
-  const isChange = line.kind !== "context";
-  const showHighlight = highlight && isChange;
-
-  const bg = !showHighlight
-    ? "bg-transparent"
-    : line.kind === "remove"
-      ? "bg-red-50"
-      : "bg-emerald-50";
-
+const Row = ({ line, animateIn }: { line: MdLine; animateIn: boolean }) => {
   const sign = line.kind === "remove" ? "-" : line.kind === "add" ? "+" : " ";
   const signColor =
     line.kind === "remove"
       ? "text-red-600"
       : line.kind === "add"
         ? "text-emerald-600"
-        : "text-gray-300";
-  const textColor = !showHighlight
-    ? "text-gray-500"
+        : "text-transparent";
+
+  const bg = line.flash
+    ? "bg-yellow-100"
     : line.kind === "remove"
+      ? "bg-red-50"
+      : line.kind === "add"
+        ? "bg-emerald-50"
+        : "bg-transparent";
+
+  const textColor =
+    line.kind === "remove"
       ? "text-red-900 line-through decoration-red-400"
       : line.kind === "add"
         ? "text-emerald-900"
@@ -84,32 +79,37 @@ const DiffRow = ({
   return (
     <div
       className={cn(
-        "grid grid-cols-[2.5rem_1rem_1fr] items-start transition-colors duration-500",
+        "grid grid-cols-[2.5rem_1rem_1fr] items-start transition-all duration-500 ease-out",
         bg,
-        showHighlight && line.kind === "add" && "animate-fade-in",
+        animateIn && "animate-fade-in",
       )}
     >
-      <span className="select-none px-2 py-0.5 text-right text-[10px] tabular-nums text-gray-400">
+      <span className="select-none px-2 py-0.5 text-right text-[11px] tabular-nums text-gray-400">
         {line.lineNo}
       </span>
-      <span className={cn("select-none py-0.5 text-xs font-bold", signColor)}>
+      <span className={cn("select-none py-0.5 text-sm font-bold leading-relaxed", signColor)}>
         {sign}
       </span>
-      <span className={cn("py-0.5 pr-3 text-xs leading-relaxed", textColor)}>
+      <span className={cn("py-0.5 pr-3 text-sm leading-relaxed", textColor)}>
         {line.text}
       </span>
     </div>
   );
 };
 
-const StatusPill = ({ extracted }: { extracted: boolean }) =>
+const StatusPill = ({ extracted, pulse }: { extracted: boolean; pulse: boolean }) =>
   extracted ? (
-    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 transition-all duration-300",
+        pulse && "scale-105",
+      )}
+    >
       <Check className="h-3 w-3" />
       Extracted
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary px-2 py-0.5 text-xs font-medium text-gray-500">
+    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary px-2 py-0.5 text-xs font-medium text-gray-500 transition-all duration-300">
       <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
       Pending
     </span>
@@ -118,6 +118,10 @@ const StatusPill = ({ extracted }: { extracted: boolean }) =>
 const Diff = () => {
   const [phase, setPhase] = useState<Phase>("idle");
   const [visibleLogs, setVisibleLogs] = useState(0);
+  const [lines, setLines] = useState<MdLine[]>(BASE_LINES);
+  const [extracted, setExtracted] = useState(false);
+  const [pillPulse, setPillPulse] = useState(false);
+  const [animatedKeys, setAnimatedKeys] = useState<Set<string>>(new Set());
   const timersRef = useRef<number[]>([]);
 
   useEffect(() => {
@@ -131,34 +135,98 @@ const Diff = () => {
 
   useEffect(() => () => clearTimers(), []);
 
+  const schedule = (ms: number, fn: () => void) => {
+    timersRef.current.push(window.setTimeout(fn, ms));
+  };
+
   const handleProcess = () => {
     clearTimers();
-    setPhase("logs");
+    setPhase("running");
     setVisibleLogs(0);
+    setLines(BASE_LINES);
+    setExtracted(false);
+    setPillPulse(false);
+    setAnimatedKeys(new Set());
 
-    LOG_LINES.forEach((_, i) => {
-      const t = window.setTimeout(
-        () => setVisibleLogs((n) => Math.max(n, i + 1)),
-        200 + i * 280,
+    // Engine log lines
+    schedule(200, () => setVisibleLogs(1));
+    schedule(700, () => setVisibleLogs(2));
+    schedule(1200, () => setVisibleLogs(3));
+
+    // t=1600ms — flash line 140 yellow
+    schedule(1600, () => {
+      setLines((prev) =>
+        prev.map((l) => (l.key === "l140" ? { ...l, flash: true } : l)),
       );
-      timersRef.current.push(t);
     });
 
-    timersRef.current.push(
-      window.setTimeout(() => setPhase("diff"), 1200),
-      window.setTimeout(() => setPhase("done"), 2400),
-    );
+    // t=1900ms — turn line 140 into a "remove" + insert 3 new "add" lines below it
+    schedule(1900, () => {
+      setLines((prev) => {
+        const out: MdLine[] = [];
+        for (const l of prev) {
+          if (l.key === "l140") {
+            out.push({ ...l, flash: false, kind: "remove" });
+            out.push({
+              key: "n140",
+              lineNo: 140,
+              text: "  cancellation_status: by_tenant [^k1]",
+              kind: "add",
+            });
+            out.push({
+              key: "n141",
+              lineNo: 141,
+              text: "    - notice_date: 2025-07-16",
+              kind: "add",
+            });
+            out.push({
+              key: "n142",
+              lineNo: 142,
+              text: "    - move_out_date: TBD (Übergabe in Verhandlung)",
+              kind: "add",
+            });
+            out.push({
+              key: "n143",
+              lineNo: 143,
+              text: "    - remaining_rents: TBD",
+              kind: "add",
+            });
+          } else if (l.key === "l141") {
+            out.push({ ...l, lineNo: 144 });
+          } else if (l.key === "l142") {
+            out.push({ ...l, lineNo: 145 });
+          } else {
+            out.push(l);
+          }
+        }
+        return out;
+      });
+      setAnimatedKeys(new Set(["n140", "n141", "n142", "n143"]));
+    });
+
+    // t=2600ms — pill becomes Extracted with pulse
+    schedule(2600, () => {
+      setExtracted(true);
+      setPillPulse(true);
+    });
+    schedule(3000, () => {
+      setPillPulse(false);
+      setPhase("done");
+    });
   };
 
   const handleReset = () => {
     clearTimers();
     setPhase("idle");
     setVisibleLogs(0);
+    setLines(BASE_LINES);
+    setExtracted(false);
+    setPillPulse(false);
+    setAnimatedKeys(new Set());
   };
 
-  const extracted = phase === "done";
-  const showDiff = phase === "diff" || phase === "done";
-  const isRunning = phase === "logs" || phase === "diff";
+  const isRunning = phase === "running";
+  const logVisible = phase !== "idle";
 
   return (
     <section className="space-y-8">
@@ -177,7 +245,7 @@ const Diff = () => {
                 incremental/20250716_kuendigung_LTR-0231.pdf
               </span>
             </div>
-            <StatusPill extracted={extracted} />
+            <StatusPill extracted={extracted} pulse={pillPulse} />
           </div>
           <div className="whitespace-pre-wrap p-4 font-serif text-sm leading-relaxed text-gray-700">
             {SOURCE_LETTER}
@@ -195,14 +263,20 @@ const Diff = () => {
             </div>
             <span className="font-mono text-[11px] text-gray-500">§2 lease</span>
           </div>
-          <div className="font-mono">
-            {DIFF_LINES.map((line, i) => (
-              <DiffRow key={i} line={line} highlight={showDiff} />
-            ))}
+          <div className="flex flex-1 flex-col">
+            <div className="min-h-[360px] font-mono">
+              {lines.map((line) => (
+                <Row
+                  key={line.key}
+                  line={line}
+                  animateIn={animatedKeys.has(line.key)}
+                />
+              ))}
+            </div>
+            <p className="mt-auto border-t border-border bg-secondary/30 px-4 py-2 text-xs italic text-gray-500">
+              …300 more lines unchanged…
+            </p>
           </div>
-          <p className="border-t border-border bg-secondary/30 px-4 py-2 text-xs italic text-gray-500">
-            …300 more lines unchanged…
-          </p>
         </Card>
       </div>
 
@@ -213,7 +287,10 @@ const Diff = () => {
             onClick={handleProcess}
             disabled={isRunning}
             size="lg"
-            className="h-11 px-6 text-base"
+            className={cn(
+              "h-11 px-6 text-base",
+              isRunning && "cursor-not-allowed opacity-50",
+            )}
           >
             <Play className="mr-2 h-4 w-4" />
             {isRunning ? "Processing…" : "Process incoming file"}
@@ -228,26 +305,32 @@ const Diff = () => {
           </button>
         </div>
 
-        {phase !== "idle" && (
-          <Card className="w-full max-w-2xl border-border bg-card p-4">
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-gray-500">
-              engine log
-            </p>
-            <div className="space-y-1 font-mono text-xs leading-relaxed">
-              {LOG_LINES.map((line, i) => (
-                <div
-                  key={i}
-                  className={cn(
-                    "text-gray-600",
-                    i < visibleLogs ? "animate-fade-in" : "invisible opacity-0",
-                  )}
-                >
-                  <span className="text-gray-400">→</span> {line}
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
+        {/* Engine log — reserved space, fades in */}
+        <div
+          className={cn(
+            "w-full max-w-2xl rounded-lg border border-gray-200 bg-gray-50 p-4 transition-opacity duration-300",
+            logVisible ? "opacity-100" : "pointer-events-none opacity-0",
+          )}
+        >
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-gray-500">
+            engine log
+          </p>
+          <div className="space-y-1 font-mono text-xs leading-relaxed">
+            {LOG_LINES.map((line, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "text-gray-700 transition-all duration-300 ease-out",
+                  i < visibleLogs
+                    ? "translate-x-0 opacity-100"
+                    : "-translate-x-2 opacity-0",
+                )}
+              >
+                <span className="text-gray-400">→</span> {line}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

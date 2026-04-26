@@ -14,7 +14,7 @@ const SiteLayout = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {!demoMode && (
-        <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
+        <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6">
           <NavLink to="/" className="font-mono text-base font-semibold tracking-tight text-foreground">
             Buena-Context-Engine
