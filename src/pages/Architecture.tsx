@@ -16,22 +16,24 @@ const FlowDiagram = () => {
   const totalSourcesW = SOURCES.length * sourceW + (SOURCES.length - 1) * sourceGap;
   const sourcesStartX = (1100 - totalSourcesW) / 2;
 
-  // Engine box
-  const engineX = 350;
+  // Engine box — wider so the long subtitle line fits comfortably
+  const engineW = 560;
+  const engineH = 130;
+  const engineX = (1100 - engineW) / 2; // centered
   const engineY = 240;
-  const engineW = 400;
-  const engineH = 110;
 
-  // Output row
-  const outY = 470;
+  // Output row — pushed further down and spread apart so the curved
+  // "Aggregation Bus" arrow + label has clear vertical space and doesn't
+  // overlap the tiles or arrows.
+  const outY = 540;
   const outH = 70;
-  const propX = 170;
-  const unitX = 620;
-  const outW = 310;
+  const outW = 320;
+  const propX = 70;
+  const unitX = 1100 - 70 - outW; // 710
 
   return (
     <svg
-      viewBox="0 0 1100 620"
+      viewBox="0 0 1100 700"
       className="w-full"
       role="img"
       aria-label="context.md architecture diagram"
@@ -215,12 +217,16 @@ const FlowDiagram = () => {
 
       {/* Aggregation bus: curved arrow from unit MD up to property MD */}
       {(() => {
-        const startX = unitX + 20;
+        const startX = unitX + 30;
         const startY = outY;
-        const endX = propX + outW - 20;
+        const endX = propX + outW - 30;
         const endY = outY;
-        // Arc upward
-        const ctrlY = outY - 90;
+        // Apex of the arc — kept comfortably below the engine box
+        // (engine ends at engineY + engineH = 370) so neither the curve
+        // nor the label collide with arrows or tiles.
+        const apexY = 445;
+        // Cubic control points use a steeper Y to give a smooth, low arc.
+        const ctrlY = apexY - 55;
         return (
           <>
             <path
@@ -230,24 +236,45 @@ const FlowDiagram = () => {
               strokeWidth={1.5}
               markerEnd="url(#arrow-accent)"
             />
-            <text
-              x={(startX + endX) / 2}
-              y={ctrlY + 14}
-              textAnchor="middle"
-              className="fill-primary"
-              style={{ font: "500 14px Inter, sans-serif" }}
-            >
-              Aggregation Bus
-            </text>
-            <text
-              x={(startX + endX) / 2}
-              y={ctrlY + 32}
-              textAnchor="middle"
-              className="fill-gray-500"
-              style={{ font: "400 12px Inter, sans-serif" }}
-            >
-              deterministic events · ~80% no LLM
-            </text>
+            {/* Label sits just above the arc apex, with a soft white
+                background pill so it never visually collides with the
+                stroke. */}
+            {(() => {
+              const labelCx = (startX + endX) / 2;
+              const labelCy = apexY - 6;
+              const labelW = 360;
+              const labelH = 50;
+              return (
+                <>
+                  <rect
+                    x={labelCx - labelW / 2}
+                    y={labelCy - labelH / 2}
+                    width={labelW}
+                    height={labelH}
+                    rx={8}
+                    fill="hsl(0 0% 100%)"
+                  />
+                  <text
+                    x={labelCx}
+                    y={labelCy - 4}
+                    textAnchor="middle"
+                    className="fill-primary"
+                    style={{ font: "600 15px Inter, sans-serif" }}
+                  >
+                    Aggregation Bus
+                  </text>
+                  <text
+                    x={labelCx}
+                    y={labelCy + 16}
+                    textAnchor="middle"
+                    className="fill-gray-500"
+                    style={{ font: "400 13px Inter, sans-serif" }}
+                  >
+                    deterministic events · ~80% no LLM
+                  </text>
+                </>
+              );
+            })()}
           </>
         );
       })()}
