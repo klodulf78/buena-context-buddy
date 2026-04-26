@@ -98,42 +98,40 @@ const FlowDiagram = () => {
             </div>
           </div>
 
-          {/* Aggregation Bus capsule with curved accent return arrow */}
-          <div className="relative mt-3 flex justify-center">
+          {/* Aggregation Bus — clean U-bracket connecting the two MD cards */}
+          <div className="mt-6 flex flex-col items-center gap-2">
             <svg
-              viewBox="0 0 600 50"
-              className="absolute inset-x-0 top-0 mx-auto h-10 w-full max-w-2xl"
+              width="100%"
+              height="32"
+              viewBox="0 0 400 32"
               preserveAspectRatio="none"
+              className="max-w-2xl"
               aria-hidden="true"
             >
               <defs>
                 <marker
-                  id="agg-arrow-2"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto-start-reverse"
+                  id="agg-arrowhead"
+                  markerWidth="8"
+                  markerHeight="8"
+                  refX="4"
+                  refY="4"
+                  orient="auto"
                 >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="hsl(221 83% 53%)" />
+                  <path d="M0,0 L8,4 L0,8 Z" fill="#2563eb" />
                 </marker>
               </defs>
               <path
-                d="M 540 8 C 540 38, 60 38, 60 8"
+                d="M 380 4 L 380 20 L 20 20 L 20 4"
+                stroke="#2563eb"
+                strokeWidth="1.5"
                 fill="none"
-                stroke="hsl(221 83% 53%)"
-                strokeWidth={1.5}
-                markerEnd="url(#agg-arrow-2)"
+                markerEnd="url(#agg-arrowhead)"
+                strokeLinejoin="round"
               />
             </svg>
-            <div className="relative z-10 mt-7 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-background px-3 py-1">
-              <span className="font-mono text-xs font-medium text-primary">
-                Aggregation Bus
-              </span>
-              <span className="text-xs text-gray-500">
-                · deterministic events · ~80% no LLM
-              </span>
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-3 py-1 text-xs">
+              <span className="font-semibold text-blue-600">Aggregation Bus</span>
+              <span className="text-gray-500">· deterministic events · ~80% no LLM</span>
             </div>
           </div>
         </Card>
