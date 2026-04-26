@@ -60,33 +60,9 @@ const TILES: Tile[] = [
     status: "soon",
   },
   {
-    emoji: "⚖️",
-    title: "ETV Beschluss-Prep",
-    description: "Prepare Eigentümerversammlung resolutions with full context.",
-    status: "soon",
-  },
-  {
-    emoji: "🏢",
-    title: "Vacancy Listing",
-    description: "Auto-generate listings from unit MD, sync to portals.",
-    status: "soon",
-  },
-  {
-    emoji: "💰",
-    title: "Insurance Claim Drafting",
-    description: "Compile incident timelines and supporting evidence.",
-    status: "soon",
-  },
-  {
     emoji: "📑",
     title: "Mietspiegel Benchmarking",
     description: "Compare current Kaltmiete against local Mietspiegel bands.",
-    status: "soon",
-  },
-  {
-    emoji: "🛡️",
-    title: "Compliance Watch",
-    description: "Track Rauchmelder, Heizung, and statutory deadlines.",
     status: "soon",
   },
 ];
