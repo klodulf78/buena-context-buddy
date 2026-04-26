@@ -240,13 +240,20 @@ const Architecture = () => {
             30%  { box-shadow: 0 0 0 6px hsl(221 83% 53% / 0.6); }
             100% { box-shadow: 0 0 0 0 hsl(221 83% 53% / 0); }
           }
+          /* Agent ring: pulse occupies first ~8% of a 2400ms cycle (~200ms),
+             then stays transparent for the rest. Per-agent delays produce the
+             round-robin effect. */
           @keyframes arch-ring-agent {
-            0%, 100% { box-shadow: 0 0 0 0 hsl(221 83% 53% / 0); }
-            50%      { box-shadow: 0 0 0 3px hsl(221 83% 53% / 0.7); }
+            0%   { box-shadow: 0 0 0 0 hsl(221 83% 53% / 0); }
+            4%   { box-shadow: 0 0 0 3px hsl(221 83% 53% / 0.7); }
+            8%   { box-shadow: 0 0 0 0 hsl(221 83% 53% / 0); }
+            100% { box-shadow: 0 0 0 0 hsl(221 83% 53% / 0); }
           }
+          /* Annotation flash: matches the same 2400ms cycle, dimming briefly
+             whenever an agent rings (4 quick dips per cycle). */
           @keyframes arch-flash-anno {
-            0%, 100% { opacity: 1; }
-            50%      { opacity: 0.5; }
+            0%, 24%, 26%, 49%, 51%, 74%, 76%, 99% { opacity: 1; }
+            25%, 50%, 75%, 100% { opacity: 0.5; }
           }
 
           /* BUILD pulse — runs once: source → engine → substrate.
@@ -267,32 +274,24 @@ const Architecture = () => {
             animation: arch-ring-strong 700ms ease-out 1800ms 1;
           }
 
-          /* READ pulses — each agent rings in turn, looping every 2.4s after
-             build (4 agents × 600ms each). Annotation flashes alongside. */
+          /* READ pulses — each agent rings in turn on a shared 2400ms loop,
+             starting after the build sequence (delay 2700ms). */
           .arch-anim-on > div > section:first-child > div > div:nth-child(1) {
-            animation: arch-ring-agent 200ms ease-in-out 2700ms infinite;
-            animation-duration: 200ms;
+            animation: arch-ring-agent 2400ms linear 2700ms infinite;
           }
           .arch-anim-on > div > section:first-child > div > div:nth-child(2) {
-            animation: arch-ring-agent 200ms ease-in-out 3300ms infinite;
+            animation: arch-ring-agent 2400ms linear 3300ms infinite;
           }
           .arch-anim-on > div > section:first-child > div > div:nth-child(3) {
-            animation: arch-ring-agent 200ms ease-in-out 3900ms infinite;
+            animation: arch-ring-agent 2400ms linear 3900ms infinite;
           }
           .arch-anim-on > div > section:first-child > div > div:nth-child(4) {
-            animation: arch-ring-agent 200ms ease-in-out 4500ms infinite;
-          }
-          /* Stagger the loop — give every agent a 2400ms cycle */
-          .arch-anim-on > div > section:first-child > div > div:nth-child(1),
-          .arch-anim-on > div > section:first-child > div > div:nth-child(2),
-          .arch-anim-on > div > section:first-child > div > div:nth-child(3),
-          .arch-anim-on > div > section:first-child > div > div:nth-child(4) {
-            animation-iteration-count: infinite;
+            animation: arch-ring-agent 2400ms linear 4500ms infinite;
           }
 
           /* "$0.02 per query…" annotation flashes on every agent ring */
           .arch-anim-on > div > section:first-child > p {
-            animation: arch-flash-anno 600ms ease-in-out 2700ms infinite;
+            animation: arch-flash-anno 2400ms linear 2700ms infinite;
           }
         `}</style>
 
