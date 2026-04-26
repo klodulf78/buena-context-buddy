@@ -2,7 +2,7 @@ import { useEffect, type ComponentType } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowUpRight,
-  Banknote,
+  Wallet,
   Calculator,
   CalendarClock,
   DoorOpen,
@@ -28,7 +28,7 @@ type Tile = {
 
 const TILES: Tile[] = [
   {
-    icon: Banknote,
+    icon: Wallet,
     title: "Payment & Dunning",
     description: "Detect arrears, draft Mahnungen, and cite every payment.",
     status: "live",
