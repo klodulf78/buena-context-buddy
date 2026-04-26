@@ -68,11 +68,13 @@ const MD_ANSWER = `**Tenant:** Frau Jasmin Trub (\`MIE-025\`), unit \`EH-019\` (
 **Sources:** [^bank], [^mahn], [^em-mm], [^em-ws], [^em-sm] — all in \`context.unit.EH-019.md §5\`
 `;
 
-const RAW_ANSWER = `Based on my analysis of the property files for the Buena demo dataset, tenant Jasmin Trub at unit EH-019 appears to have a complex situation. Reviewing the bank statement export I can see that monthly rent payments of approximately 1206 EUR have been received from her IBAN starting in early 2024 and continuing through December 2025. There was a dunning letter sent in November 2024 referencing missed rent for that month, however the bank record indicates a payment was received on the first of November 2024.
+const RAW_ANSWER = `Tenant Jasmin Trub at unit EH-019 (WE 19, building HAUS-14) is currently not in active dunning. The lease was cancelled by the tenant on July 16, 2025, with the move-out date still in negotiation.
 
-The tenant has communicated multiple times via email regarding maintenance issues including water damage in the bathroom, mold in the bedroom, and various other repair requests. There are also messages indicating a notice of intent to terminate the lease and announce a rent reduction.
+Looking at the bank statement: 23 consecutive monthly rent payments of €1,206 — that's a Kaltmiete of €1,031 plus Nebenkosten of €175 — have been received from January 2024 through December 1, 2025.
 
-Without specific source citations, I would estimate the tenant is currently not in arrears, but there are pending issues that may affect the lease relationship. Please verify with the original documents.
+There is one historical dunning event worth flagging: a Stage-1 reminder letter was sent on November 16, 2024 referencing a missed November 2024 rent. However, looking at the bank record, a payment was actually received on November 1, 2024. This was apparently a false-positive that has since been resolved.
+
+Two active concerns: the tenant has announced a unilateral Mietminderung that is still pending agreement, and there are two critical open repair tickets — water damage in the bathroom and mold in the bedroom — both currently assigned to Sanitär Schulze.
 `;
 
 type AgentState = {
