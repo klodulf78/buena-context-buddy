@@ -160,6 +160,7 @@ const Gallery = () => {
       <PageHeader
         eyebrow="Use-Case Gallery"
         title={"Every workflow runs on the same context.md\u00A0substrate."}
+        titleClassName="max-w-none text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl lg:whitespace-nowrap"
       />
 
       <p className="font-mono text-sm text-gray-500">
