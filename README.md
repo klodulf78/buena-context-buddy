@@ -1,5 +1,9 @@
 # buena-context-buddy
 
+<p align="center">
+  <img src="./logo.png" alt="buena-context-buddy logo" width="50%" />
+</p>
+
 A **demo UI** for the `context.md` substrate — a pre-built Markdown layer that lets property-management AI agents answer questions about a unit or property without re-reading every raw source file each time.
 
 This repo is the front-end story. The pipeline that actually produces and updates the `context.*.md` files lives in a separate backend:
@@ -40,7 +44,7 @@ Result: a set of `context.property.LIE-XXX.md` and `context.unit.EH-XXX.md` file
 
 The frontend treats the resolver's outputs as the substrate it queries against. The mental model behind each page:
 
-- **`/` — Benchmark.** Two agents answer the same tenant question. **MD-Agent** loads one `context.unit.EH-019.md` (the resolver's output); **Raw-Claude** would scan all raw files. Cost / latency / citations are the things the substrate buys you. *Today this page is animated from fixtures; live wiring would call a Supabase edge function (see `supabase/functions/answer_question`) that loads the MD file and prompts an LLM.*
+- **`/` — Benchmark.** Two agents answer the same tenant question. **MD-Agent** loads one `context.unit.EH-019.md` (the resolver's output); **Raw-Claude** would scan all raw files. Cost / latency / citations are the things the substrate buys you. _Today this page is animated from fixtures; live wiring would call a Supabase edge function (see `supabase/functions/answer_question`) that loads the MD file and prompts an LLM._
 - **`/diff` — Surgical update.** A new source file (a Kündigung PDF) lands in `incremental/`. The resolver re-runs and patches one line — `cancellation_status: none` becomes `cancellation_status: by_tenant [^k1]` with three new sub-fields under it — inside the `<!-- auto:lease -->` block of `context.unit.EH-019.md`. Everything outside the auto-block (Human Notes, free-form prose) is untouched. The page visualizes that backend behavior.
 - **`/arch` — Architecture.** The tier diagram (Sources → Engine → Context Substrate → Agents) and the aggregation bus correspond directly to the resolver's pipeline stages above.
 - **`/gallery` — Use-case gallery.** Each tile is an agent that, in production, would read the same MD substrate. Only Payment & Dunning is wired today.
