@@ -279,10 +279,27 @@ const FlowDiagram = () => {
   );
 };
 
-const STATS = [
-  { value: "$0.05", label: "Per property per day" },
-  { value: "$50", label: "At 1,000 properties per day" },
-  { value: "40–100×", label: "Cheaper than naive re-extract" },
+const STATS: { value: string; label: string; sub: string }[] = [
+  {
+    value: "$0.02",
+    label: "Per agent query",
+    sub: "vs $0.47 raw-data baseline",
+  },
+  {
+    value: "27×",
+    label: "Cheaper per query",
+    sub: "measured at our benchmark",
+  },
+  {
+    value: "$8M+",
+    label: "Annual savings at 1,000 properties",
+    sub: "vs raw-data approach",
+  },
+  {
+    value: "Flat",
+    label: "Per-query cost as data grows",
+    sub: "raw-data scales with history — we don't",
+  },
 ];
 
 const Architecture = () => {
@@ -301,7 +318,7 @@ const Architecture = () => {
         <FlowDiagram />
       </Card>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {STATS.map((s) => (
           <Card
             key={s.label}
@@ -310,13 +327,17 @@ const Architecture = () => {
             <div className="font-mono text-5xl font-bold tabular-nums text-primary">
               {s.value}
             </div>
-            <div className="text-sm uppercase tracking-wide text-gray-500">{s.label}</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-gray-700">
+              {s.label}
+            </div>
+            <div className="mt-2 text-xs italic text-gray-500">{s.sub}</div>
           </Card>
         ))}
       </div>
 
       <p className="text-base italic text-gray-600">
-        Cost stays flat as the platform grows. The MD file is the product.
+        Cost per query stays constant as the platform grows. Every year of data makes raw-data
+        approaches more expensive. MD-Agent stays at two cents.
       </p>
     </section>
   );
