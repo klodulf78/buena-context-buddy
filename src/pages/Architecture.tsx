@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/PageHeader";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const SOURCES = ["emails/", "bank/", "briefe/", "rechnungen/", "stammdaten/"];
 const AGENTS = ["Repair Triage", "Dunning", "Owner Reports", "Compliance Watch"];
@@ -13,27 +14,21 @@ const TierLabel = ({ children }: { children: React.ReactNode }) => (
 );
 
 /**
- * Inline arrow + caption used between tiers. `variant="read"` is accent
- * (substrate → agents); `variant="build"` is subtle slate (sources → engine
- * → substrate). Lives on a single centered row, py-2 only.
+ * Inline arrow + caption used between tiers. A single Lucide chevron is the
+ * entire arrow representation — no separate vertical line.
  */
 const InlineConnector = ({
-  variant,
   direction,
   caption,
 }: {
-  variant: "read" | "build";
   direction: "down" | "up";
   caption: string;
 }) => {
-  const arrow = direction === "down" ? "↓" : "↑";
-  const arrowColor = variant === "read" ? "text-primary" : "text-slate-400";
+  const Icon = direction === "down" ? ChevronDown : ChevronUp;
   return (
-    <div className="flex items-center justify-center gap-2 py-2">
-      <span className={`text-base font-semibold ${arrowColor}`} aria-hidden="true">
-        {arrow}
-      </span>
-      <span className="text-sm italic text-gray-500">{caption}</span>
+    <div className="flex items-center justify-center gap-2 py-3 text-gray-500">
+      <Icon className="w-4 h-4 text-slate-400" strokeWidth={1.5} />
+      <span className="text-sm italic">{caption}</span>
     </div>
   );
 };
@@ -69,8 +64,8 @@ const FlowDiagram = () => {
         </p>
       </section>
 
-      {/* TIER 2 — read pipeline arrow (accent) */}
-      <InlineConnector variant="read" direction="down" caption="READ — many times per day" />
+      {/* TIER 2 — read pipeline arrow */}
+      <InlineConnector direction="down" caption="READ — many times per day" />
 
       {/* TIER 3 — Context substrate (visually dominant) */}
       <section>
@@ -144,12 +139,8 @@ const FlowDiagram = () => {
         </Card>
       </section>
 
-      {/* TIER 4 — build pipeline arrow up into substrate (subtle) */}
-      <InlineConnector
-        variant="build"
-        direction="up"
-        caption="BUILD — once per source change"
-      />
+      {/* TIER 4 — build pipeline arrow up into substrate */}
+      <InlineConnector direction="up" caption="BUILD — once per source change" />
 
       {/* TIER 5 — Engine (light) */}
       <section>
