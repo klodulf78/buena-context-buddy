@@ -237,22 +237,18 @@ const Home = () => {
     md: { ...initialState },
     raw: { ...initialState },
   });
-  const rafRef = useRef<number | null>(null);
-  const startRef = useRef<number | null>(null);
-  const fadeTimersRef = useRef<number[]>([]);
+  const intervalsRef = useRef<number[]>([]);
+  const timeoutsRef = useRef<number[]>([]);
 
   useEffect(() => {
     document.title = "context.md Demo — MD-Agent vs Raw-Claude";
   }, []);
 
   const stopAnimation = () => {
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-    fadeTimersRef.current.forEach((id) => window.clearTimeout(id));
-    fadeTimersRef.current = [];
-    startRef.current = null;
+    intervalsRef.current.forEach((id) => window.clearInterval(id));
+    intervalsRef.current = [];
+    timeoutsRef.current.forEach((id) => window.clearTimeout(id));
+    timeoutsRef.current = [];
   };
 
   useEffect(() => () => stopAnimation(), []);
@@ -273,57 +269,48 @@ const Home = () => {
     });
 
     const startedAt = performance.now();
-    startRef.current = startedAt;
 
-    // Schedule answer fade-ins independently so we can show them right when
-    // each agent transitions to "done".
+    // One interval per agent — ticks every 50ms, ramps cost & latency
+    // linearly to the final values, then locks and shows the answer.
     AGENTS.forEach((agent) => {
-      const timer = window.setTimeout(() => {
-        setStates((prev) => ({
-          ...prev,
-          [agent.id]: { ...prev[agent.id], showAnswer: true },
-        }));
-      }, agent.durationMs + 80);
-      fadeTimersRef.current.push(timer);
-    });
-
-    const tick = (now: number) => {
-      const elapsed = now - startedAt;
-      let allDone = true;
-
-      setStates((prev) => {
-        const next = { ...prev };
-        for (const agent of AGENTS) {
-          const current = next[agent.id];
-          if (elapsed >= agent.durationMs) {
-            next[agent.id] = {
-              ...current,
+      const intervalId = window.setInterval(() => {
+        const elapsed = performance.now() - startedAt;
+        if (elapsed >= agent.durationMs) {
+          window.clearInterval(intervalId);
+          intervalsRef.current = intervalsRef.current.filter((id) => id !== intervalId);
+          setStates((prev) => ({
+            ...prev,
+            [agent.id]: {
+              ...prev[agent.id],
               status: "done",
               cost: agent.finalCost,
               latency: agent.finalLatency,
-            };
-          } else {
-            allDone = false;
-            const p = progressForTime(elapsed, agent.durationMs, agent.costWaypoints);
-            next[agent.id] = {
-              ...current,
-              status: "running",
-              cost: agent.finalCost * p,
-              latency: agent.finalLatency * p,
-            };
-          }
+              answer: finalAnswers[agent.id],
+            },
+          }));
+          // Fade in answer shortly after reaching Done
+          const fadeTimer = window.setTimeout(() => {
+            setStates((prev) => ({
+              ...prev,
+              [agent.id]: { ...prev[agent.id], showAnswer: true },
+            }));
+          }, 80);
+          timeoutsRef.current.push(fadeTimer);
+          return;
         }
-        return next;
-      });
-
-      if (!allDone) {
-        rafRef.current = requestAnimationFrame(tick);
-      } else {
-        rafRef.current = null;
-      }
-    };
-
-    rafRef.current = requestAnimationFrame(tick);
+        const p = elapsed / agent.durationMs;
+        setStates((prev) => ({
+          ...prev,
+          [agent.id]: {
+            ...prev[agent.id],
+            status: "running",
+            cost: agent.finalCost * p,
+            latency: agent.finalLatency * p,
+          },
+        }));
+      }, 50);
+      intervalsRef.current.push(intervalId);
+    });
   };
 
   const bothDone = states.md.status === "done" && states.raw.status === "done";
@@ -333,19 +320,6 @@ const Home = () => {
     md: MD_ANSWER,
     raw: RAW_ANSWER,
   };
-
-  // Inject answers when each agent finishes, only if not already set.
-  useEffect(() => {
-    (Object.keys(finalAnswers) as AgentSpec["id"][]).forEach((id) => {
-      if (states[id].status === "done" && !states[id].answer) {
-        setStates((prev) => ({
-          ...prev,
-          [id]: { ...prev[id], answer: finalAnswers[id] },
-        }));
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [states.md.status, states.raw.status]);
 
   return (
     <section className="space-y-10">
