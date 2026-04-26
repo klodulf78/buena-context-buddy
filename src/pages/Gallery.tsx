@@ -1,6 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, type ComponentType } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
+import {
+  ArrowUpRight,
+  Banknote,
+  Calculator,
+  CalendarClock,
+  DoorOpen,
+  KeyRound,
+  LineChart,
+  Scale,
+  Wrench,
+  type LucideProps,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/PageHeader";
@@ -8,7 +19,7 @@ import { PageHeader } from "@/components/PageHeader";
 type TileStatus = "live" | "soon";
 
 type Tile = {
-  emoji: string;
+  icon: ComponentType<LucideProps>;
   title: string;
   description: string;
   status: TileStatus;
@@ -17,50 +28,50 @@ type Tile = {
 
 const TILES: Tile[] = [
   {
-    emoji: "📊",
+    icon: Banknote,
     title: "Payment & Dunning",
     description: "Detect arrears, draft Mahnungen, and cite every payment.",
     status: "live",
     to: "/",
   },
   {
-    emoji: "🔧",
+    icon: Wrench,
     title: "Repair Triage",
     description: "Route maintenance tickets to the right Handwerker, track SLA.",
     status: "soon",
   },
   {
-    emoji: "🧾",
+    icon: Calculator,
     title: "NK-Abrechnung Q&A",
     description: "Answer tenant questions about Nebenkostenabrechnungen with sources.",
     status: "soon",
   },
   {
-    emoji: "🏠",
+    icon: KeyRound,
     title: "Tenant Onboarding",
     description: "Generate Mietverträge, collect docs, schedule move-in.",
     status: "soon",
   },
   {
-    emoji: "🚪",
+    icon: DoorOpen,
     title: "Move-out Coordinator",
     description: "Übergabe-Termine, deposit settlement, final invoices.",
     status: "soon",
   },
   {
-    emoji: "📅",
+    icon: CalendarClock,
     title: "Maintenance Calendar",
     description: "Recurring inspections, Wartungsverträge, due-date alerts.",
     status: "soon",
   },
   {
-    emoji: "📨",
+    icon: LineChart,
     title: "Owner Reporting",
     description: "Monthly owner statements drafted from the MD substrate.",
     status: "soon",
   },
   {
-    emoji: "📑",
+    icon: Scale,
     title: "Mietspiegel Benchmarking",
     description: "Compare current Kaltmiete against local Mietspiegel bands.",
     status: "soon",
@@ -87,7 +98,9 @@ const StatusBadge = ({ status }: { status: TileStatus }) => {
 const TileBody = ({ tile }: { tile: Tile }) => (
   <>
     <div className="flex items-start justify-between">
-      <div className="text-3xl leading-none">{tile.emoji}</div>
+      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+        <tile.icon className="h-5 w-5 text-blue-600" strokeWidth={1.75} />
+      </div>
       {tile.status === "live" && (
         <ArrowUpRight className="h-4 w-4 text-primary opacity-0 transition-opacity group-hover:opacity-100" />
       )}
